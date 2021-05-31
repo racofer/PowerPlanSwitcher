@@ -32,3 +32,6 @@ Power Scheme GUID: f8e3807e-a6a3-4000-8c67-2600ed46d70b  (Gaming)
 ```
 
 What you want is the long alphanumeric string, i.e., *381b4222-f694-41f0-9685-ff5bb260df2e* is the GUID for the *Balanced* Power Plan in this example.
+
+# How do I know it's working?
+If you open the Control Panel and go to Power Options, Windows lists the available Power Plans and highlights the currently active one. If the extension is working properly, then this window will automatically change according to the currently enabled Power Plan. Alternatively, you can type in `powercfg /l` command in the *Command Prompt* to list the available Power Plans, and the currently active Power Plan will have an asterisk next to it.
