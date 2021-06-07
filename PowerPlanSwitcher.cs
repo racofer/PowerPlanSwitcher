@@ -128,12 +128,12 @@ namespace PowerPlanSwitcher
 
         public override void OnApplicationStarted()
         {
-            // Add code to be executed when Playnite is initialized.
+            ChangePowerPlan(settings.DefaultPowerPlan);
         }
 
         public override void OnApplicationStopped()
         {
-            // Add code to be executed when Playnite is shutting down.
+            ChangePowerPlan(settings.DefaultPowerPlan);
         }
 
         public override void OnLibraryUpdated()
