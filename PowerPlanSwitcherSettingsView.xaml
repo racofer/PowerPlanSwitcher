@@ -7,10 +7,10 @@
              d:DesignHeight="400" d:DesignWidth="600">
     <StackPanel>
         <TextBlock Text="Default Power Plan GUID:"/>
-        <TextBox Text="{Binding DefaultPowerPlan}"/>
+        <TextBox Text="{Binding Settings.DefaultPowerPlan}"/>
         <TextBlock Text="Gaming Power Plan GUID:"/>
-        <TextBox Text="{Binding GamingPowerPlan}"/>
+        <TextBox Text="{Binding Settings.GamingPowerPlan}"/>
         <TextBlock Text="Ignored Sources:"/>
-        <TextBox Text="{Binding IgnoredSources}"/>
+        <TextBox Text="{Binding Settings.IgnoredSources}"/>
     </StackPanel>
 </UserControl>

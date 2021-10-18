@@ -1,5 +1,6 @@
 ﻿using Playnite.SDK;
 using Playnite.SDK.Models;
+using Playnite.SDK.Events;
 using Playnite.SDK.Plugins;
 using System;
 using System.Collections.Generic;
@@ -12,11 +13,11 @@ using System.IO;
 
 namespace PowerPlanSwitcher
 {
-    public class PowerPlanSwitcher : Plugin
+    public class PowerPlanSwitcher : GenericPlugin
     {
         private static readonly ILogger logger = LogManager.GetLogger();
 
-        private PowerPlanSwitcherSettings settings { get; set; }
+        private PowerPlanSwitcherSettingsViewModel settings { get; set; }
 
         public override Guid Id { get; } = Guid.Parse("8d0af913-8f5f-4f8c-adef-527be337a619");
 
@@ -55,53 +56,48 @@ namespace PowerPlanSwitcher
 
         public PowerPlanSwitcher(IPlayniteAPI api) : base(api)
         {
-            settings = new PowerPlanSwitcherSettings(this);
+            settings = new PowerPlanSwitcherSettingsViewModel(this);
             runningGames = new List<Guid>();
+
+            Properties = new GenericPluginProperties
+            {
+                HasSettings = true
+            };
         }
 
-        public override void OnGameInstalled(Game game)
-        {
-            // Add code to be executed when game is finished installing.
-        }
-
-        public override void OnGameStarted(Game game)
-        {
-            // Add code to be executed when game is started running.
-        }
-
-        public override void OnGameStarting(Game game)
+        public override void OnGameStarting(OnGameStartingEventArgs args)
         {
             string gameSource;
-            if (game.Source == null)
+            if (args.Game.Source == null)
             {
                 gameSource = "";
             }
             else
             {
-                gameSource = game.Source.Name;
+                gameSource = args.Game.Source.Name;
             }
-            string[] ignoredSources = settings.IgnoredSources.Split(',');
+            string[] ignoredSources = settings.Settings.IgnoredSources.Split(',');
             if (new List<string>(ignoredSources).Any(x => x.Equals(gameSource, StringComparison.InvariantCultureIgnoreCase)))
             {
                 // Cancel power plan change.
                 return;
             }
-            RegisterRunningGame(game);
-            ChangePowerPlan(settings.GamingPowerPlan);
+            RegisterRunningGame(args.Game);
+            ChangePowerPlan(settings.Settings.GamingPowerPlan);
         }
 
-        public override void OnGameStopped(Game game, long elapsedSeconds)
+        public override void OnGameStopped(OnGameStoppedEventArgs args)
         {
             string gameSource;
-            if (game.Source == null)
+            if (args.Game.Source == null)
             {
                 gameSource = "";
             }
             else
             {
-                gameSource = game.Source.Name;
+                gameSource = args.Game.Source.Name;
             }
-            string[] ignoredSources = settings.IgnoredSources.Split(',');
+            string[] ignoredSources = settings.Settings.IgnoredSources.Split(',');
             if (new List<string>(ignoredSources).Any(x => x.Equals(gameSource, StringComparison.InvariantCultureIgnoreCase)))
             {
                 // Cancel power plan change.
@@ -109,7 +105,7 @@ namespace PowerPlanSwitcher
             }
             try
             {
-                UnregisterRunningGames(game);
+                UnregisterRunningGames(args.Game);
             }
             catch (Exception e)
             {
@@ -117,28 +113,8 @@ namespace PowerPlanSwitcher
             }
             if (runningGames.Count == 0)
             {
-                ChangePowerPlan(settings.DefaultPowerPlan);
+                ChangePowerPlan(settings.Settings.DefaultPowerPlan);
             }
-        }
-
-        public override void OnGameUninstalled(Game game)
-        {
-            // Add code to be executed when game is uninstalled.
-        }
-
-        public override void OnApplicationStarted()
-        {
-            ChangePowerPlan(settings.DefaultPowerPlan);
-        }
-
-        public override void OnApplicationStopped()
-        {
-            ChangePowerPlan(settings.DefaultPowerPlan);
-        }
-
-        public override void OnLibraryUpdated()
-        {
-            // Add code to be executed when library is updated.
         }
 
         public override ISettings GetSettings(bool firstRunSettings)
